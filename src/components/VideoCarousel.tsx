@@ -114,7 +114,7 @@ export default function VideoCarousel() {
 
   return (
     <article 
-      className="reveal relative w-full mt-0 sm:mt-6 mb-8 transition-all flex flex-col items-center pt-0 pb-6 sm:py-6"
+      className="reveal relative w-full mt-0 sm:mt-6 mb-8 transition-all flex flex-col items-center pt-16 sm:pt-0 pb-6 sm:py-6"
     >
       <div className="text-center mb-6">
          <h2 className="font-title text-3xl font-extrabold text-zinc-900 dark:text-white">

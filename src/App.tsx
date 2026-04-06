@@ -157,7 +157,7 @@ function App() {
       <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-[100vw] sm:max-w-7xl flex-col px-0 py-0 sm:px-8 sm:py-8 lg:px-12 selection:bg-teal-500/30 overflow-hidden">
 
         <section className="grid items-stretch gap-6 pt-0 md:pt-4">
-          <article className="glass-card relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 lg:min-h-[520px] lg:p-16 border border-teal-900/10 dark:border-white/10 shadow-xl transition-transform duration-500">
+          <article className="glass-card min-h-[100dvh] sm:min-h-0 flex flex-col justify-center sm:block relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 lg:min-h-[520px] lg:p-16 border border-teal-900/10 dark:border-white/10 shadow-xl transition-transform duration-500">
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-teal-500/15 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none" />
 
@@ -211,7 +211,7 @@ function App() {
 
         <VideoCarousel />
 
-        <section className="reveal-group mt-6 grid gap-6 lg:grid-cols-2">
+        <section className="reveal-group mt-6 pt-16 sm:pt-0 grid gap-6 lg:grid-cols-2">
           <article className="reveal-item glass-card group overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 transition-all hover:bg-slate-100/50 hover:dark:bg-white/[0.04] border-transparent hover:border-teal-500/20 hover:dark:border-teal-500/30">
             <div className="flex flex-col h-full">
               <h2 className="font-title text-2xl font-bold text-zinc-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">
@@ -270,7 +270,7 @@ function App() {
           </article>
         </section>
 
-        <section className="reveal-group mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="reveal-group mt-6 pt-16 sm:pt-0 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <article className="reveal-item glass-card relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 border-teal-500/20 dark:border-teal-500/30 transition-transform duration-500 hover:translate-y-[-4px]">
             <div className="absolute -left-12 -top-12 h-40 w-40 rounded-full bg-teal-500/20 blur-[80px]" />
             <div className="absolute -bottom-14 right-8 h-40 w-40 rounded-full bg-emerald-500/20 blur-[80px]" />
@@ -370,7 +370,7 @@ function App() {
           </aside>
         </section>
 
-        <section className="reveal-group mt-6 grid gap-6 pb-12 lg:grid-cols-2">
+        <section className="reveal-group mt-6 pt-16 sm:pt-0 grid gap-6 pb-12 lg:grid-cols-2">
           <article className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 sm:p-10 transition-transform duration-500 hover:translate-y-[-4px]">
             <div className="mb-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 dark:text-teal-400 mb-2">
