@@ -1,0 +1,194 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700&family=Sora:wght@500;700;800&display=swap");
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --scroll-y: 0px;
+  --mouse-x: 0;
+  --mouse-y: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Light Mode Defaults */
+body {
+  margin: 0;
+  color: #0f172a; /* slate-900 */
+  font-family: "Manrope", sans-serif;
+  background-color: #f8fafc; /* slate-50 */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15), transparent 25%);
+  overflow-x: hidden;
+  transition: background-color 0.5s ease;
+}
+
+/* Dark Mode Overrides */
+html.dark body {
+  color: #e4e4e7; /* zinc-200 */
+  background-color: #09090b; /* zinc-950 */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(20, 184, 166, 0.05), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05), transparent 25%);
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Parallax Background */
+.parallax-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-image: url("./assets/optic_store_bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+html.dark .parallax-bg {
+  opacity: 0.35;
+  filter: brightness(0.5) saturate(1.2);
+}
+
+.parallax-layer {
+  position: absolute;
+  inset: -14%;
+  will-change: transform;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.layer-back {
+  background:
+    radial-gradient(circle at 14% 12%, rgba(20, 184, 166, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 84% 11%, rgba(16, 185, 129, 0.1) 0%, transparent 35%),
+    radial-gradient(circle at 78% 72%, rgba(13, 148, 136, 0.08) 0%, transparent 45%);
+  transform: translate3d(calc(var(--mouse-x) * 18px), calc(var(--scroll-y) * -0.08 + var(--mouse-y) * 12px), 0);
+  animation: parallax-drift-back 25s ease-in-out infinite alternate;
+}
+
+html.dark .layer-back {
+  background:
+    radial-gradient(circle at 14% 12%, rgba(20, 184, 166, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 84% 11%, rgba(16, 185, 129, 0.06) 0%, transparent 35%),
+    radial-gradient(circle at 78% 72%, rgba(13, 148, 136, 0.05) 0%, transparent 45%);
+}
+
+.layer-mid {
+  background:
+    radial-gradient(circle at 65% 35%, rgba(0, 0, 0, 0.02) 0%, transparent 45%),
+    repeating-linear-gradient(-36deg, rgba(0, 0, 0, 0.01) 0, rgba(0, 0, 0, 0.01) 1px, transparent 1px, transparent 40px);
+  transform: translate3d(calc(var(--mouse-x) * -24px), calc(var(--scroll-y) * -0.15 + var(--mouse-y) * -18px), 0);
+  opacity: 0.8;
+  mix-blend-mode: multiply;
+  animation: parallax-drift-mid 30s ease-in-out infinite alternate;
+}
+
+html.dark .layer-mid {
+  background:
+    radial-gradient(circle at 65% 35%, rgba(255, 255, 255, 0.02) 0%, transparent 45%),
+    repeating-linear-gradient(-36deg, rgba(255, 255, 255, 0.01) 0, rgba(255, 255, 255, 0.01) 1px, transparent 1px, transparent 40px);
+  mix-blend-mode: color-dodge;
+}
+
+.layer-front {
+  background:
+    radial-gradient(circle at 7% 92%, rgba(20, 184, 166, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 52% 105%, rgba(16, 185, 129, 0.08) 0%, transparent 35%);
+  filter: blur(8px);
+  transform: translate3d(calc(var(--mouse-x) * 36px), calc(var(--scroll-y) * -0.24 + var(--mouse-y) * 24px), 0);
+  animation: parallax-drift-front 20s ease-in-out infinite alternate;
+}
+
+html.dark .layer-front {
+  background:
+    radial-gradient(circle at 7% 92%, rgba(20, 184, 166, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 52% 105%, rgba(16, 185, 129, 0.04) 0%, transparent 35%);
+}
+
+@keyframes parallax-drift-back {
+  from { transform: translate3d(calc(var(--mouse-x) * 18px), calc(var(--scroll-y) * -0.08 + var(--mouse-y) * 12px), 0); }
+  to { transform: translate3d(calc(var(--mouse-x) * 18px + 10px), calc(var(--scroll-y) * -0.08 + var(--mouse-y) * 12px - 15px), 0); }
+}
+
+@keyframes parallax-drift-mid {
+  from { transform: translate3d(calc(var(--mouse-x) * -24px), calc(var(--scroll-y) * -0.15 + var(--mouse-y) * -18px), 0); }
+  to { transform: translate3d(calc(var(--mouse-x) * -24px - 12px), calc(var(--scroll-y) * -0.15 + var(--mouse-y) * -18px + 15px), 0); }
+}
+
+@keyframes parallax-drift-front {
+  from { transform: translate3d(calc(var(--mouse-x) * 36px), calc(var(--scroll-y) * -0.24 + var(--mouse-y) * 24px), 0); }
+  to { transform: translate3d(calc(var(--mouse-x) * 36px + 15px), calc(var(--scroll-y) * -0.24 + var(--mouse-y) * 24px - 12px), 0); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.font-title {
+  font-family: "Sora", sans-serif;
+}
+
+/* Base Glass Card (Light Mode) */
+.glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+}
+
+/* Premium Dark Glass Card */
+html.dark .glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Scroll Revel Animation */
+.reveal-group { }
+
+.reveal-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax-layer, .reveal, .animate-pulse, .animate-\\[float_6s_ease-in-out_infinite\\] {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .parallax-bg {
+    display: none;
+  }
+}
