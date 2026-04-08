@@ -55,6 +55,8 @@ function App() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [isDark, setIsDark] = useState(true);
+  const darkThemeColor = "#0b1220";
+  const lightThemeColor = "#0f766e";
 
   // Sincroniza o tema da interface com a classe raiz usada pelo Tailwind.
   useEffect(() => {
@@ -62,6 +64,14 @@ function App() {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
+    }
+
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute(
+        "content",
+        isDark ? darkThemeColor : lightThemeColor,
+      );
     }
   }, [isDark]);
 
