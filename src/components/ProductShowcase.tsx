@@ -48,6 +48,14 @@ const AUTO_SCROLL_INTERVAL_MS = 3500;
 const INERTIA_FRICTION = 0.92;
 const INERTIA_MIN_START_SPEED = 0.01;
 const INERTIA_MIN_STOP_SPEED = 0.02;
+const PIX_DISCOUNT_RATE = 0.05;
+const CARD_DISCOUNT_RATE = 0.09;
+const INSTALLMENTS = 10;
+
+const brlFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 
 function getLoopedIndex(index: number, total: number) {
   return (index + total) % total;
@@ -307,6 +315,42 @@ function getProductWhatsAppHref(whatsappNumber: string, productName: string) {
   );
 
   return `https://wa.me/${whatsappNumber}?text=${message}`;
+}
+
+function parsePriceFromHint(priceHint: string) {
+  const matchedPrice = priceHint.match(/\d{1,3}(?:\.\d{3})*,\d{2}/);
+  if (!matchedPrice) {
+    return null;
+  }
+
+  const normalizedValue = matchedPrice[0].replace(/\./g, "").replace(",", ".");
+  const parsedValue = Number.parseFloat(normalizedValue);
+
+  if (Number.isNaN(parsedValue)) {
+    return null;
+  }
+
+  return parsedValue;
+}
+
+function getCardPricing(priceHint: string) {
+  const basePrice = parsePriceFromHint(priceHint);
+  if (basePrice === null) {
+    return null;
+  }
+
+  const originalPrice = basePrice / (1 - CARD_DISCOUNT_RATE);
+  const pixPrice = basePrice * (1 - PIX_DISCOUNT_RATE);
+  const installmentValue = basePrice / INSTALLMENTS;
+
+  return {
+    originalPrice: brlFormatter.format(originalPrice),
+    basePrice: brlFormatter.format(basePrice),
+    pixPrice: brlFormatter.format(pixPrice),
+    installmentValue: brlFormatter.format(installmentValue),
+    cardDiscountPercent: Math.round(CARD_DISCOUNT_RATE * 100),
+    pixDiscountPercent: Math.round(PIX_DISCOUNT_RATE * 100),
+  };
 }
 
 export default function ProductShowcase({
@@ -695,50 +739,91 @@ export default function ProductShowcase({
             {filteredProducts.map((product) => (
               <article
                 key={product.id}
-                className="group min-w-65 sm:min-w-75 lg:min-w-[320px] snap-start overflow-hidden rounded-3xl border border-teal-900/10 bg-white/80 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/60"
+                className="group min-w-65 sm:min-w-75 lg:min-w-[320px] snap-start overflow-hidden rounded-3xl border border-zinc-300/70 bg-zinc-100/80 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/60"
               >
                 <button
                   type="button"
                   onClick={() => openProductViewer(product)}
                   onMouseDown={(event) => event.stopPropagation()}
-                  className="relative h-44 w-full overflow-hidden cursor-zoom-in"
+                  className="relative h-56 w-full overflow-hidden cursor-zoom-in bg-white"
                   aria-label={`Abrir visualizador de imagens do modelo ${product.name}`}
                 >
                   <img
                     src={product.image}
                     alt={product.name}
                     loading="lazy"
-                    className={`h-44 w-full object-cover transition-opacity duration-300 ${product.hoverImage ? "group-hover:opacity-0" : ""}`}
+                    className={`h-56 w-full object-contain transition-opacity duration-300 ${product.hoverImage ? "group-hover:opacity-0" : ""}`}
                   />
                   {product.hoverImage && (
                     <img
                       src={product.hoverImage}
                       alt={`${product.name} detalhe`}
                       loading="lazy"
-                      className="absolute inset-0 h-44 w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      className="absolute inset-0 h-56 w-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     />
                   )}
                 </button>
 
                 <div className="space-y-3 p-4">
+                  <p className="inline-flex rounded-md bg-teal-500 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white dark:text-zinc-950">
+                    {Math.round(PIX_DISCOUNT_RATE * 100)}% OFF PIX
+                  </p>
+
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-teal-600 dark:text-teal-400">
-                      {product.category}
-                    </p>
-                    <h3 className="mt-1 text-lg font-bold text-zinc-900 dark:text-white">
+                    <h3 className="text-[1.1rem] leading-tight font-extrabold text-zinc-800 dark:text-white">
                       {product.name}
                     </h3>
+                    <p className="mt-2 text-[18px] leading-none tracking-[0.08em] text-teal-500 dark:text-teal-300">
+                      ★★★★★
+                    </p>
                   </div>
 
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-200">
-                    {product.priceHint}
-                  </p>
+                  {(() => {
+                    const pricing = getCardPricing(product.priceHint);
+
+                    if (!pricing) {
+                      return (
+                        <p className="text-base font-semibold text-zinc-800 dark:text-zinc-200">
+                          {product.priceHint}
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-1.5">
+                        <p className="text-sm text-zinc-500 line-through dark:text-zinc-400">
+                          {pricing.originalPrice}
+                        </p>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[2.15rem] font-extrabold leading-none text-zinc-800 dark:text-zinc-100">
+                            {pricing.basePrice}
+                          </p>
+                          <span className="rounded-lg bg-teal-600 px-3 py-1 text-sm font-extrabold text-white dark:text-zinc-950">
+                            -{pricing.cardDiscountPercent}%
+                          </span>
+                        </div>
+
+                        <p className="inline-flex rounded-md bg-emerald-200 px-2.5 py-1 text-sm font-bold text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-300">
+                          {pricing.pixPrice} no Pix (
+                          {pricing.pixDiscountPercent}%)
+                        </p>
+
+                        <p className="text-base text-zinc-600 dark:text-zinc-300">
+                          <span className="font-extrabold text-zinc-800 dark:text-zinc-100">
+                            Ou {INSTALLMENTS}x de {pricing.installmentValue}
+                          </span>{" "}
+                          sem juros
+                        </p>
+                      </div>
+                    );
+                  })()}
 
                   <a
                     href={getProductWhatsAppHref(whatsappNumber, product.name)}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center rounded-full bg-teal-500 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-teal-400 dark:text-zinc-950"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-teal-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-teal-500 dark:text-zinc-950"
                   >
                     Solicitar Orçamento
                   </a>
