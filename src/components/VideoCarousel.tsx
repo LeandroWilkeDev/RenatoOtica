@@ -121,8 +121,8 @@ export default function VideoCarousel() {
     <article className="reveal relative w-full mt-0 sm:mt-6 mb-8 transition-all flex flex-col items-center pt-16 sm:pt-0 pb-6 sm:py-6">
       <div className="text-center mb-6">
         <h2 className="font-title text-3xl font-extrabold text-zinc-900 dark:text-white">
-          Nossas{" "}
-          <span className="text-teal-600 dark:text-teal-400">Coleções</span>
+          Dicas e{" "}
+          <span className="text-teal-600 dark:text-teal-400">Promoções</span>
         </h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-zinc-400">
           Deslize para ver os modelos em destaque.
