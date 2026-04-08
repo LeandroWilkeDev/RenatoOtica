@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 
 import imgCard1 from "../assets/masculino/Armação de Óculos de Grau Ray Ban, modelo 0RX7203L, cor 8164,/imgCard1.png";
 import imgCard2 from "../assets/masculino/Armação de Óculos de Grau Ray Ban, modelo 0RX7203L, cor 8164,/imgCard2.png";
@@ -43,6 +44,14 @@ type Product = {
 };
 
 const tabs: ProductCategory[] = ["Masculino", "Feminino", "Solar", "Infantil"];
+const AUTO_SCROLL_INTERVAL_MS = 3500;
+const INERTIA_FRICTION = 0.92;
+const INERTIA_MIN_START_SPEED = 0.01;
+const INERTIA_MIN_STOP_SPEED = 0.02;
+
+function getLoopedIndex(index: number, total: number) {
+  return (index + total) % total;
+}
 
 function buildAiSet(
   name: string,
@@ -365,11 +374,11 @@ export default function ProductShowcase({
 
     const intervalId = window.setInterval(() => {
       setActiveIndex((current) => {
-        const next = (current + 1) % filteredProducts.length;
+        const next = getLoopedIndex(current + 1, filteredProducts.length);
         scrollToCard(next);
         return next;
       });
-    }, 3500);
+    }, AUTO_SCROLL_INTERVAL_MS);
 
     return () => {
       window.clearInterval(intervalId);
@@ -388,16 +397,14 @@ export default function ProductShowcase({
       }
 
       if (event.key === "ArrowRight") {
-        setViewerIndex(
-          (current) => (current + 1) % Math.max(viewerImages.length, 1),
+        setViewerIndex((current) =>
+          getLoopedIndex(current + 1, Math.max(viewerImages.length, 1)),
         );
       }
 
       if (event.key === "ArrowLeft") {
-        setViewerIndex(
-          (current) =>
-            (current - 1 + Math.max(viewerImages.length, 1)) %
-            Math.max(viewerImages.length, 1),
+        setViewerIndex((current) =>
+          getLoopedIndex(current - 1, Math.max(viewerImages.length, 1)),
         );
       }
     };
@@ -431,16 +438,14 @@ export default function ProductShowcase({
   };
 
   const showPreviousImage = () => {
-    setViewerIndex(
-      (current) =>
-        (current - 1 + Math.max(viewerImages.length, 1)) %
-        Math.max(viewerImages.length, 1),
+    setViewerIndex((current) =>
+      getLoopedIndex(current - 1, Math.max(viewerImages.length, 1)),
     );
   };
 
   const showNextImage = () => {
-    setViewerIndex(
-      (current) => (current + 1) % Math.max(viewerImages.length, 1),
+    setViewerIndex((current) =>
+      getLoopedIndex(current + 1, Math.max(viewerImages.length, 1)),
     );
   };
 
@@ -476,8 +481,8 @@ export default function ProductShowcase({
 
     const nextIndex =
       direction === "left"
-        ? (activeIndex - 1 + filteredProducts.length) % filteredProducts.length
-        : (activeIndex + 1) % filteredProducts.length;
+        ? getLoopedIndex(activeIndex - 1, filteredProducts.length)
+        : getLoopedIndex(activeIndex + 1, filteredProducts.length);
 
     setActiveIndex(nextIndex);
     scrollToCard(nextIndex);
@@ -498,21 +503,20 @@ export default function ProductShowcase({
     stopInertia();
 
     let velocity = dragVelocityRef.current;
-    if (Math.abs(velocity) < 0.01) {
+    if (Math.abs(velocity) < INERTIA_MIN_START_SPEED) {
       return;
     }
 
-    const friction = 0.92;
-
+    // Aplica inercia suave para manter o gesto natural apos soltar o mouse.
     const animate = () => {
       if (!sliderRef.current) {
         return;
       }
 
       sliderRef.current.scrollLeft -= velocity * 16;
-      velocity *= friction;
+      velocity *= INERTIA_FRICTION;
 
-      if (Math.abs(velocity) > 0.02) {
+      if (Math.abs(velocity) > INERTIA_MIN_STOP_SPEED) {
         inertiaFrameRef.current = window.requestAnimationFrame(animate);
       } else {
         inertiaFrameRef.current = null;
@@ -533,11 +537,12 @@ export default function ProductShowcase({
     }
   };
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (!sliderRef.current || event.button !== 0) {
       return;
     }
 
+    // Ativa arraste apenas para mouse tradicional, evitando conflito com touch.
     if (!window.matchMedia("(pointer: fine)").matches) {
       return;
     }
@@ -552,7 +557,7 @@ export default function ProductShowcase({
     dragVelocityRef.current = 0;
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (!sliderRef.current || !isMouseDraggingRef.current) {
       return;
     }
@@ -690,7 +695,7 @@ export default function ProductShowcase({
             {filteredProducts.map((product) => (
               <article
                 key={product.id}
-                className="group min-w-[260px] sm:min-w-[300px] lg:min-w-[320px] snap-start overflow-hidden rounded-3xl border border-teal-900/10 bg-white/80 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/60"
+                className="group min-w-65 sm:min-w-75 lg:min-w-[320px] snap-start overflow-hidden rounded-3xl border border-teal-900/10 bg-white/80 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-zinc-900/60"
               >
                 <button
                   type="button"
@@ -765,7 +770,7 @@ export default function ProductShowcase({
 
       {isViewerOpen && (
         <div
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/85 p-4"
+          className="fixed inset-0 z-120 flex items-center justify-center bg-black/85 p-4"
           role="dialog"
           aria-modal="true"
           aria-label="Visualizador de imagens do produto"

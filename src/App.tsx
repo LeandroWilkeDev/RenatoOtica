@@ -12,6 +12,21 @@ import PrescriptionBanner from "./components/PrescriptionBanner";
 import FAQAccordion from "./components/FAQAccordion";
 import StoreFooter from "./components/StoreFooter";
 
+type Testimonial = {
+  name: string;
+  rating: number;
+  avatar: string;
+  text: string;
+};
+
+const WHATSAPP_NUMBER = "5581979107498";
+const MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=Avenida+Barretos+De+Menezes,+628+-+E,+Prazeres,+Jaboatao+dos+Guararapes+-+PE,+54310-310";
+
+function buildWhatsAppUrl(number: string, message: string) {
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
 const testimonials = [
   {
     name: "Mariana Costa",
@@ -34,14 +49,14 @@ const testimonials = [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80",
     text: "Exame rápido e explicações claras. Volto com certeza para comprar o segundo óculos.",
   },
-];
+] satisfies Testimonial[];
 
 function App() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [isDark, setIsDark] = useState(true);
 
-  // Escuro/Claro Logic
+  // Sincroniza o tema da interface com a classe raiz usada pelo Tailwind.
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -50,7 +65,7 @@ function App() {
     }
   }, [isDark]);
 
-  // Efeitos Mouse Parallax globais
+  // Atualiza variável CSS de scroll para efeitos visuais desacoplados do React.
   useEffect(() => {
     const handleScroll = () => {
       document.documentElement.style.setProperty(
@@ -65,6 +80,7 @@ function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Atualiza variáveis CSS de posição do mouse para o parallax em desktop.
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (
@@ -88,9 +104,8 @@ function App() {
     };
   }, []);
 
-  // Animação em Cascata Nativa (Efeito "Montando" Seguro sem quebrar Grid)
+  // Ativa animações em cascata no hero e nos blocos que entram no viewport.
   useEffect(() => {
-    // Ativa logo de cara a seção inicial
     const heroItems = document.querySelectorAll(".hero-item");
     heroItems.forEach((item, index) => {
       setTimeout(
@@ -101,7 +116,6 @@ function App() {
       );
     });
 
-    // Observer para animar o resto dos itens com scroll de forma limpa em cascata
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -112,7 +126,7 @@ function App() {
                 item.classList.add("active");
               }, index * 150);
             });
-            observer.unobserve(entry.target); // Deixa ativado permanentemente depois do reload
+            observer.unobserve(entry.target);
           }
         });
       },
@@ -126,23 +140,15 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  const whatsappNumber = "5511999999999";
-  const whatsappMessage = encodeURIComponent(
+  const whatsappHref = buildWhatsAppUrl(
+    WHATSAPP_NUMBER,
     "Olá! Quero agendar meu exame e conhecer os modelos da Renato Óculos.",
   );
-  const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
-  const mapsUrl =
-    "https://www.google.com/maps/search/?api=1&query=Avenida+Barretos+De+Menezes,+628+-+E,+Prazeres,+Jaboatao+dos+Guararapes+-+PE,+54310-310";
 
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const leadMessage = encodeURIComponent(
-      `Olá! Meu nome é ${name} e meu número é ${phone}. Quero receber atendimento da Renato Óculos.`,
-    );
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${leadMessage}`,
-      "_blank",
-    );
+    const leadMessage = `Olá! Meu nome é ${name} e meu número é ${phone}. Quero receber atendimento da Renato Óculos.`;
+    window.open(buildWhatsAppUrl(WHATSAPP_NUMBER, leadMessage), "_blank");
   };
 
   const logoPhoto = isDark ? logoDark : logoLight;
@@ -193,7 +199,7 @@ function App() {
 
       <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-[100vw] sm:max-w-7xl flex-col px-0 py-0 sm:px-8 sm:py-8 lg:px-12 selection:bg-teal-500/30 overflow-hidden">
         <section className="grid items-stretch gap-6 pt-0 md:pt-4">
-          <article className="glass-card min-h-[100dvh] sm:min-h-0 flex flex-col justify-center sm:block relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 lg:min-h-[520px] lg:p-16 border border-teal-900/10 dark:border-white/10 shadow-xl transition-transform duration-500">
+          <article className="glass-card min-h-dvh sm:min-h-0 flex flex-col justify-center sm:block relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 lg:min-h-130 lg:p-16 border border-teal-900/10 dark:border-white/10 shadow-xl transition-transform duration-500">
             <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-teal-500/15 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none" />
 
@@ -202,7 +208,7 @@ function App() {
               <img
                 src={logoPhoto}
                 alt="Logo Renato Óculos"
-                className="relative w-auto h-auto max-w-[200px] sm:max-w-[260px] lg:max-w-[320px] xl:max-w-[420px] max-h-[350px] object-contain drop-shadow-xl dark:drop-shadow-[0_5px_20px_rgba(20,184,166,0.3)] animate-[float_6s_ease-in-out_infinite]"
+                className="relative w-auto h-auto max-w-50 sm:max-w-65 lg:max-w-[320px] xl:max-w-105 max-h-87.5 object-contain drop-shadow-xl dark:drop-shadow-[0_5px_20px_rgba(20,184,166,0.3)] animate-[float_6s_ease-in-out_infinite]"
                 loading="eager"
               />
             </div>
@@ -214,7 +220,7 @@ function App() {
               </div>
               <h1 className="hero-item reveal-item font-title text-[2.5rem] font-extrabold leading-[1.1] tracking-[-0.02em] text-zinc-900 dark:text-white sm:text-[4rem]">
                 Visão perfeita,
-                <span className="mt-2 block bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600 dark:from-teal-300 dark:via-emerald-300 dark:to-teal-500 bg-clip-text text-transparent">
+                <span className="mt-2 block bg-linear-to-r from-teal-500 via-emerald-500 to-teal-600 dark:from-teal-300 dark:via-emerald-300 dark:to-teal-500 bg-clip-text text-transparent">
                   Design impecável.
                 </span>
               </h1>
@@ -247,12 +253,12 @@ function App() {
 
         <VideoCarousel />
 
-        <ProductShowcase whatsappNumber={whatsappNumber} />
+        <ProductShowcase whatsappNumber={WHATSAPP_NUMBER} />
 
-        <PrescriptionBanner whatsappNumber={whatsappNumber} />
+        <PrescriptionBanner whatsappNumber={WHATSAPP_NUMBER} />
 
         <section className="reveal-group mt-6 pt-16 sm:pt-0 grid gap-6 lg:grid-cols-2">
-          <article className="reveal-item glass-card group overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 transition-all hover:bg-slate-100/50 hover:dark:bg-white/[0.04] border-transparent hover:border-teal-500/20 hover:dark:border-teal-500/30">
+          <article className="reveal-item glass-card group overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 transition-all hover:bg-slate-100/50 hover:dark:bg-white/4 border-transparent hover:border-teal-500/20 hover:dark:border-teal-500/30">
             <div className="flex flex-col h-full">
               <h2 className="font-title text-2xl font-bold text-zinc-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">
                 Armações a partir de R$ 69,90
@@ -262,8 +268,8 @@ function App() {
                 conforto no dia a dia e preço acessível.
               </p>
 
-              <div className="mt-8 overflow-hidden rounded-3xl relative mt-auto border border-teal-900/10 dark:border-white/5 shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 dark:from-zinc-950/80 to-transparent z-10 transition-opacity duration-500 group-hover:opacity-80" />
+              <div className="overflow-hidden rounded-3xl relative mt-auto border border-teal-900/10 dark:border-white/5 shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+                <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 dark:from-zinc-950/80 to-transparent z-10 transition-opacity duration-500 group-hover:opacity-80" />
                 <video
                   src={glassVideo}
                   className="h-72 w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
@@ -277,7 +283,7 @@ function App() {
             </div>
           </article>
 
-          <article className="reveal-item glass-card group overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 transition-all hover:bg-slate-100/50 hover:dark:bg-white/[0.04] border-transparent hover:border-teal-500/20 hover:dark:border-teal-500/30">
+          <article className="reveal-item glass-card group overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 transition-all hover:bg-slate-100/50 hover:dark:bg-white/4 border-transparent hover:border-teal-500/20 hover:dark:border-teal-500/30">
             <div className="flex flex-col h-full">
               <h2 className="font-title text-2xl font-bold text-zinc-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">
                 Exame de vista grátis*
@@ -287,8 +293,8 @@ function App() {
                 digital para medição precisa e recomendação ideal.
               </p>
 
-              <div className="mt-8 overflow-hidden rounded-3xl relative mt-auto border border-teal-900/10 dark:border-white/5 shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 dark:from-zinc-950/80 to-transparent z-10" />
+              <div className="overflow-hidden rounded-3xl relative mt-auto border border-teal-900/10 dark:border-white/5 shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)]">
+                <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 dark:from-zinc-950/80 to-transparent z-10" />
                 <img
                   src={examDigitalPhoto}
                   alt="Oftalmo realizando exame de vista digital"
@@ -322,7 +328,7 @@ function App() {
         </section>
 
         <section className="reveal-group mt-6 pt-16 sm:pt-0 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-          <article className="reveal-item glass-card relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 lg:p-14 border-teal-500/20 dark:border-teal-500/30 transition-transform duration-500 hover:translate-y-[-4px]">
+          <article className="reveal-item glass-card relative overflow-hidden rounded-none sm:rounded-[2.5rem] p-8 sm:p-12 lg:p-14 border-teal-500/20 dark:border-teal-500/30 transition-transform duration-500 hover:-translate-y-1">
             <div className="absolute -left-12 -top-12 h-40 w-40 rounded-full bg-teal-500/20 blur-[80px]" />
             <div className="absolute -bottom-14 right-8 h-40 w-40 rounded-full bg-emerald-500/20 blur-[80px]" />
 
@@ -332,7 +338,7 @@ function App() {
                   <p className="inline-flex shrink-0 rounded-full border border-teal-500/30 bg-teal-500/10 px-4 py-1.5 text-sm font-bold uppercase tracking-[0.14em] text-teal-700 dark:text-teal-300">
                     Oferta Especial
                   </p>
-                  <div className="h-px w-full bg-gradient-to-r from-teal-500/30 to-transparent" />
+                  <div className="h-px w-full bg-linear-to-r from-teal-500/30 to-transparent" />
                 </div>
                 <h2 className="font-title mt-5 text-4xl font-extrabold leading-[1.05] text-zinc-900 dark:text-white sm:text-5xl">
                   Lentes Premium <br />
@@ -359,20 +365,20 @@ function App() {
                 <img
                   src={promoModelPhoto}
                   alt="Cliente usando oculos em campanha promocional"
-                  className="relative z-10 mx-auto h-80 w-full max-w-[360px] rounded-3xl object-cover shadow-xl dark:shadow-[0_20px_40px_rgba(0,0,0,0.6)] border border-teal-900/10 dark:border-white/10 transition-transform duration-500 group-hover:scale-[1.02] sm:h-[24rem] lg:h-[27rem]"
+                  className="relative z-10 mx-auto h-80 w-full max-w-90 rounded-3xl object-cover shadow-xl dark:shadow-[0_20px_40px_rgba(0,0,0,0.6)] border border-teal-900/10 dark:border-white/10 transition-transform duration-500 group-hover:scale-[1.02] sm:h-96 lg:h-108"
                   loading="lazy"
                 />
               </div>
             </div>
           </article>
 
-          <aside className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 flex flex-col transition-transform duration-500 hover:translate-y-[-4px]">
+          <aside className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 flex flex-col transition-transform duration-500 hover:-translate-y-1">
             <div className="flex items-center gap-3 mb-6">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-zinc-600 to-transparent" />
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-300 dark:via-zinc-600 to-transparent" />
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 dark:text-teal-400 text-center">
                 Depoimentos
               </p>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-300 dark:via-zinc-600 to-transparent" />
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-300 dark:via-zinc-600 to-transparent" />
             </div>
 
             <h2 className="font-title text-2xl font-bold text-center text-zinc-900 dark:text-white mb-8">
@@ -425,7 +431,7 @@ function App() {
         </section>
 
         <section className="reveal-group mt-6 pt-16 sm:pt-0 grid gap-6 pb-12 lg:grid-cols-2">
-          <article className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 sm:p-10 transition-transform duration-500 hover:translate-y-[-4px]">
+          <article className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 sm:p-10 transition-transform duration-500 hover:-translate-y-1">
             <div className="mb-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-600 dark:text-teal-400 mb-2">
                 Onde estamos
@@ -455,7 +461,7 @@ function App() {
             </div>
           </article>
 
-          <article className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 sm:p-10 flex flex-col justify-center relative overflow-hidden transition-transform duration-500 hover:translate-y-[-4px]">
+          <article className="reveal-item glass-card rounded-none sm:rounded-[2.5rem] p-8 sm:p-10 flex flex-col justify-center relative overflow-hidden transition-transform duration-500 hover:-translate-y-1">
             <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-teal-500/10 rounded-full blur-[80px] pointer-events-none" />
 
             <div className="relative z-10">
@@ -512,7 +518,7 @@ function App() {
 
         <FAQAccordion />
 
-        <StoreFooter mapsUrl={mapsUrl} />
+        <StoreFooter mapsUrl={MAPS_URL} />
       </main>
     </>
   );
